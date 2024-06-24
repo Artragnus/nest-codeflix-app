@@ -1,3 +1,5 @@
 import { ValueObject } from "../value-object";
 
-export class Uuid extends ValueObject
+export class Uuid extends ValueObject {
+    
+}

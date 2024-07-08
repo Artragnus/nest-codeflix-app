@@ -3,6 +3,7 @@ import { ValueObject } from "../../domain/value-object";
 import { Entity } from "../../domain/value-objects/entity";
 import { Uuid } from "../../domain/value-objects/uuid.vo";
 import { InMemoryRepository } from "./in-memory.repository";
+import { NotFoundError } from "../../domain/errors/not-found.error";
 
 type StubEntityProps = {
   entity_id?: Uuid;
@@ -76,17 +77,18 @@ describe("InMemoryRepository Unit Tests", () => {
   });
 
   test("should update an entity", async () => {
-    const entity = new StubEntity({
-      entity_id: new Uuid(),
-      name: "Test",
-      price: 100,
-    });
+    const entity = new StubEntity({ name: "name", price: 100 });
     await repo.insert(entity);
-    entity.name = "Updated";
-    await repo.update(entity);
-    expect(repo.items).toHaveLength(1);
-    expect(repo.items[0]).toBe(entity);
-    expect(entity.name).toBe("Updated");
+
+    const updatedEntity = new StubEntity({
+      entity_id: entity.entity_id,
+      name: "new name",
+      price: 200,
+    });
+
+    await repo.update(updatedEntity);
+
+    expect(updatedEntity.toJSON()).toStrictEqual(repo.items[0].toJSON());
   });
 
   test("should delete an entity", async () => {
@@ -99,7 +101,7 @@ describe("InMemoryRepository Unit Tests", () => {
     await repo.delete(entity.entity_id);
     expect(repo.items).toHaveLength(0);
   });
-
+  ``;
   test("should find an entity by id", async () => {
     const entity = new StubEntity({
       entity_id: new Uuid(),

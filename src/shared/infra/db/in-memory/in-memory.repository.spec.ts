@@ -1,9 +1,6 @@
-import { before } from "lodash";
-import { ValueObject } from "../../domain/value-object";
-import { Entity } from "../../domain/value-objects/entity";
-import { Uuid } from "../../domain/value-objects/uuid.vo";
+import { Entity } from "../../../domain/value-objects/entity";
+import { Uuid } from "../../../domain/value-objects/uuid.vo";
 import { InMemoryRepository } from "./in-memory.repository";
-import { NotFoundError } from "../../domain/errors/not-found.error";
 
 type StubEntityProps = {
   entity_id?: Uuid;

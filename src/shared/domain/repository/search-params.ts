@@ -78,6 +78,6 @@ export class SearchParams<Filter = string> extends ValueObject {
     this._filter =
       value === null || value === undefined || (value as unknown) === ""
         ? null
-        : `${value} as any`;
+        : (`${value}` as any);
   }
 }

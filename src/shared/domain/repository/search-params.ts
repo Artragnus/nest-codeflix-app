@@ -17,13 +17,13 @@ export class SearchParams<Filter = string> extends ValueObject {
   protected _sort_dir: SortDirection | null;
   protected _filter: Filter | null;
 
-  constructor(props: SearchParamsConstructorProps<Filter>) {
+  constructor(props: SearchParamsConstructorProps<Filter> = {}) {
     super();
-    this._page = props.page;
-    this._per_page = props.per_page;
-    this._sort = props.sort;
-    this._sort_dir = props.sort_dir;
-    this._filter = props.filter;
+    this.page = props.page;
+    this.per_page = props.per_page;
+    this.sort = props.sort;
+    this.sort_dir = props.sort_dir;
+    this.filter = props.filter;
   }
 
   get page() {
@@ -45,6 +45,16 @@ export class SearchParams<Filter = string> extends ValueObject {
 
   private set per_page(value: number) {
     let _per_page = value === (true as any) ? this._per_page : +value;
+
+    if (
+      Number.isNaN(_per_page) ||
+      _per_page <= 0 ||
+      parseInt(_per_page as any) !== _per_page
+    ) {
+      _per_page = 15;
+    }
+
+    this._per_page = _per_page;
   }
 
   get sort() {

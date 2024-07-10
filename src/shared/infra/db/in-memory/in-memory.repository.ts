@@ -1,5 +1,10 @@
 import { NotFoundError } from "../../../domain/errors/not-found.error";
-import { IRepository } from "../../../domain/repository/repository-interface";
+import {
+  IRepository,
+  ISearchableRepository,
+} from "../../../domain/repository/repository-interface";
+import { SearchParams } from "../../../domain/repository/search-params";
+import { SearchResult } from "../../../domain/repository/search-result";
 import { ValueObject } from "../../../domain/value-object";
 import { Entity } from "../../../domain/value-objects/entity";
 export abstract class InMemoryRepository<
@@ -43,4 +48,18 @@ export abstract class InMemoryRepository<
     return this.items;
   }
   abstract getEntity(): new (...args: any[]) => E;
+}
+
+export abstract class InMemorySearchableRepository<
+    E extends Entity,
+    EntityId extends ValueObject,
+    Filter = string
+  >
+  extends InMemoryRepository<E, EntityId>
+  implements ISearchableRepository<E, EntityId, Filter>
+{
+  sortableFields: string[] = [];
+  search(props: SearchParams<Filter>): Promise<SearchResult<Entity>> {
+    throw new Error("Method not implemented.");
+  }
 }

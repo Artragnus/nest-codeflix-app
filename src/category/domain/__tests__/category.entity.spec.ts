@@ -141,7 +141,6 @@ describe("Category Unit Tests", () => {
 
 describe("Category Validator", () => {
   describe("factory methods", () => {
-    ``;
     test("should an invalid category with name property", () => {
       expect(() => Category.create({ name: null })).containsErrorMessages({
         name: [

@@ -31,7 +31,7 @@ export class CategoryFakeBuilder<TBuild = any> {
     this.chance = Chance();
   }
 
-  withEntityId(valueOrFactory: PropOrFactory<Uuid>) {
+  withUuid(valueOrFactory: PropOrFactory<Uuid>) {
     this._category_id = valueOrFactory;
     return this;
   }
@@ -109,8 +109,8 @@ export class CategoryFakeBuilder<TBuild = any> {
     return this.countObjs === 1 ? (categories[0] as any) : categories;
   }
 
-  get entity_id() {
-    return this.getValue("entity_id");
+  get category_id() {
+    return this.getValue("category_id");
   }
 
   get name() {
@@ -130,7 +130,7 @@ export class CategoryFakeBuilder<TBuild = any> {
   }
 
   private getValue(prop: any) {
-    const optional = ["entity_id", "created_at"];
+    const optional = ["category_id", "created_at"];
     const privateProp = `_${prop}` as keyof this;
     if (!this[privateProp] && optional.includes(prop)) {
       throw new Error(

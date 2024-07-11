@@ -1,6 +1,5 @@
-import { Uuid } from "../../shared/domain/value-objects/uuid.vo";
-import { Category } from "../domain/category.entity";
-
+import { Uuid } from "../../../shared/domain/value-objects/uuid.vo";
+import { Category } from "../category.entity";
 describe("Category Unit Tests", () => {
   let validateSpy: any;
   beforeEach(() => {

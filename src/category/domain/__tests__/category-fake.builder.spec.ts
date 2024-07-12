@@ -64,4 +64,13 @@ describe("Category Fake Builder Unit Test", () => {
       expect(categories[9].name).toBe("Category 10");
     });
   });
+
+  describe("category build", () => {
+    it("should create a valida category", () => {
+      const category = Category.fake().aCategory().build();
+      expect(category).toBeInstanceOf(Category);
+      expect(category.category_id).toBeInstanceOf(Uuid);
+      expect(category.created_at).toBeInstanceOf(Date);
+    });
+  });
 });

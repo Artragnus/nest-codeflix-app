@@ -69,7 +69,12 @@ export class CategorySequelizeRepository implements ICategoryRepository {
   }
 
   async findById(entity_id: Uuid): Promise<Category | null> {
-    const model = await this._get(entity_id.id);
+    const category_id = entity_id.id;
+    const model = await this._get(category_id);
+
+    if (!model) {
+      throw new NotFoundError(category_id, this.getEntity());
+    }
 
     return new Category({
       category_id: new Uuid(model.category_id),
@@ -100,31 +105,32 @@ export class CategorySequelizeRepository implements ICategoryRepository {
   async search(props: CategorySearchParams): Promise<CategorySearchResult> {
     const offset = (props.page - 1) * props.per_page;
     const limit = props.per_page;
-    const {rows:models, count} =  await this.categoryModel.findAndCountAll({
+    const { rows: models, count } = await this.categoryModel.findAndCountAll({
       ...(props.filter && {
         where: {
-          name: {[Op.like]: `%${props.filter}%`},
+          name: { [Op.like]: `%${props.filter}%` },
         },
       }),
-      ...(props.sort && this.sortableFields.includes(props.sort) 
-        ? { order: [[props.sort, props.sort_dir]]} 
+      ...(props.sort && this.sortableFields.includes(props.sort)
+        ? { order: [[props.sort, props.sort_dir]] }
         : { order: [["created_at", "desc"]] }),
-    offset,
-    limit,
-  });
+      offset,
+      limit,
+    });
 
-  return new CategorySearchResult({
-    items: models.map(model => {
-      return new Category({
-        category_id: new Uuid(model.category_id),
-        name: model.name,
-        description: model.description,
-        is_active: model.is_active,
-        created_at: model.created_at,
-      })
-    }),
-    current_page: props.page,
-    per_page: props.per_page,
-    total: count,
-  })
-}}
+    return new CategorySearchResult({
+      items: models.map((model) => {
+        return new Category({
+          category_id: new Uuid(model.category_id),
+          name: model.name,
+          description: model.description,
+          is_active: model.is_active,
+          created_at: model.created_at,
+        });
+      }),
+      current_page: props.page,
+      per_page: props.per_page,
+      total: count,
+    });
+  }
+}

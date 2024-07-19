@@ -30,10 +30,12 @@ describe("Category Sequelize Repository Integration Test", () => {
   it("shoud update a category", async () => {
     const category_id = new Uuid();
     const category = Category.fake().aCategory().withUuid(category_id).build();
+    const randomCategory = Category.fake().aCategory().build();
     await repository.insert(category);
 
     category.changeName("test");
     await repository.update(category);
+    await expect(repository.update(randomCategory)).rejects.toThrow(NotFoundError)
     let entity = await CategoryModel.findByPk(category.category_id.id);
 
     expect(entity.name).toBe("test");
@@ -62,17 +64,15 @@ describe("Category Sequelize Repository Integration Test", () => {
     expect(entity.toJSON()).toStrictEqual(category.toJSON());
     expect(entity.category_id).toStrictEqual(category.category_id);
 
-    await expect(repository.findById(new Uuid())).rejects.toThrow(
-      NotFoundError
-    );
+    await expect(repository.findById(new Uuid())).resolves.toBe(null);
   });
 
   test("delete category", async () => {
     const category = Category.fake().aCategory().build();
     await repository.insert(category);
     await repository.delete(category.category_id);
-    await expect(repository.findById(category.category_id)).rejects.toThrow(
-      NotFoundError
-    );
+    await expect(repository.findById(category.category_id)).resolves.toBe(null);
+
+    await expect(repository.delete(new Uuid())).rejects.toThrow(NotFoundError);
   });
 });

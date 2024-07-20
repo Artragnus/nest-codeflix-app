@@ -19,7 +19,9 @@ export class CategorySequelizeRepository implements ICategoryRepository {
   }
 
   async insert(entity: Category): Promise<void> {
-    await this.categoryModel.create(CategoryModelMapper.toModel(entity).toJSON());
+    await this.categoryModel.create(
+      CategoryModelMapper.toModel(entity).toJSON()
+    );
   }
 
   async bulkInsert(entities: Category[]): Promise<void> {
@@ -32,24 +34,23 @@ export class CategorySequelizeRepository implements ICategoryRepository {
 
   async update(entity: Category): Promise<void> {
     const category_id = entity.category_id.id;
-    const model = await this._get(category_id);
+    const modelProp = await this._get(category_id);
 
-    if (!model) {
+    if (!modelProp) {
       throw new NotFoundError(category_id, this.getEntity());
     }
 
     const modelToUpdate = CategoryModelMapper.toModel(entity);
-    await this.categoryModel.update(
-      modelToUpdate.toJSON(),
-      { where: { category_id } }
-    );
+    await this.categoryModel.update(modelToUpdate.toJSON(), {
+      where: { category_id },
+    });
   }
 
   async delete(entity_id: Uuid): Promise<void> {
     const category_id = entity_id.id;
-    const model = await this._get(category_id);
-    
-    if (!model) {
+    const modelProp = await this._get(category_id);
+
+    if (!modelProp) {
       throw new NotFoundError(category_id, this.getEntity());
     }
 
@@ -58,14 +59,14 @@ export class CategorySequelizeRepository implements ICategoryRepository {
 
   async findById(entity_id: Uuid): Promise<Category | null> {
     const category_id = entity_id.id;
-    const model = await this._get(category_id);
+    const modelProp = await this._get(category_id);
 
-    return model ? CategoryModelMapper.toEntity(model) : null
+    return modelProp ? CategoryModelMapper.toEntity(modelProp) : null;
   }
 
   async findAll(): Promise<Category[]> {
-    const models = await this.categoryModel.findAll();
-    return models.map((model) => {
+    const modelsProps = await this.categoryModel.findAll();
+    return modelsProps.map((model) => {
       return CategoryModelMapper.toEntity(model);
     });
   }
@@ -77,22 +78,23 @@ export class CategorySequelizeRepository implements ICategoryRepository {
   async search(props: CategorySearchParams): Promise<CategorySearchResult> {
     const offset = (props.page - 1) * props.per_page;
     const limit = props.per_page;
-    const { rows: models, count } = await this.categoryModel.findAndCountAll({
-      ...(props.filter && {
-        where: {
-          name: { [Op.like]: `%${props.filter}%` },
-        },
-      }),
-      ...(props.sort && this.sortableFields.includes(props.sort)
-        ? { order: [[props.sort, props.sort_dir]] }
-        : { order: [["created_at", "desc"]] }),
-      offset,
-      limit,
-    });
+    const { rows: modelsProps, count } =
+      await this.categoryModel.findAndCountAll({
+        ...(props.filter && {
+          where: {
+            name: { [Op.like]: `%${props.filter}%` },
+          },
+        }),
+        ...(props.sort && this.sortableFields.includes(props.sort)
+          ? { order: [[props.sort, props.sort_dir]] }
+          : { order: [["created_at", "desc"]] }),
+        offset,
+        limit,
+      });
 
     return new CategorySearchResult({
-      items: models.map((model) => {
-       return CategoryModelMapper.toEntity(model);
+      items: modelsProps.map((modelProp) => {
+        return CategoryModelMapper.toEntity(modelProp);
       }),
       current_page: props.page,
       per_page: props.per_page,

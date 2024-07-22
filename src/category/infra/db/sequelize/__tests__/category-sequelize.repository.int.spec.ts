@@ -104,6 +104,170 @@ describe("Category Sequelize Repository Integration Test", () => {
         last_page: 2,
         per_page: 15,
       });
+      searchOutput.items.forEach((item) => {
+        expect(item).toBeInstanceOf(Category);
+        expect(item.category_id).toBeDefined();
+      });
+    });
+    it("should order by created_at DESC when search params are null", async () => {
+      const created_at = new Date();
+      const categories = Category.fake()
+        .theCategories(16)
+        .withName((index) => `Test ${index}`)
+        .withDescription(null)
+        .withCreatedAt((index) => new Date(created_at.getTime() + index))
+        .build();
+      const searchOutput = await repository.search(new CategorySearchParams());
+      const items = searchOutput.items;
+      [...items].reverse().forEach((item, index) => {
+        expect(`Test ${index}`).toBe(categories[index + 1].name);
+      });
+    });
+
+    it("should apply paginate and filter", async () => {
+      const categories = [
+        Category.fake()
+          .aCategory()
+          .withName("test")
+          .withCreatedAt(new Date(new Date().getTime() + 5000))
+          .build(),
+        Category.fake()
+          .aCategory()
+          .withName("a")
+          .withCreatedAt(new Date(new Date().getTime() + 4000))
+          .build(),
+        Category.fake()
+          .aCategory()
+          .withName("TEST")
+          .withCreatedAt(new Date(new Date().getTime() + 3000))
+          .build(),
+        Category.fake()
+          .aCategory()
+          .withName("TeSt")
+          .withCreatedAt(new Date(new Date().getTime() + 1000))
+          .build(),
+      ];
+
+      await repository.bulkInsert(categories);
+      let searchOutput = await repository.search(
+        new CategorySearchParams({
+          page: 1,
+          per_page: 2,
+          filter: "TEST",
+        })
+      );
+
+      expect(searchOutput.toJSON(true)).toMatchObject(
+        new CategorySearchResult({
+          items: [categories[0], categories[2]],
+          total: 3,
+          current_page: 1,
+          per_page: 2,
+        }).toJSON(true)
+      );
+    });
+
+    it("should apply paginate and sort", async () => {
+      expect(repository.sortableFields).toStrictEqual(["name", "created_at"]);
+
+      const categories = [
+        Category.fake().aCategory().withName("d").build(),
+        Category.fake().aCategory().withName("b").build(),
+        Category.fake().aCategory().withName("a").build(),
+        Category.fake().aCategory().withName("c").build(),
+      ];
+
+      await repository.bulkInsert(categories);
+
+      const arrange = [
+        {
+          params: new CategorySearchParams({
+            page: 1,
+            per_page: 2,
+            sort: "name",
+          }),
+
+          result: new CategorySearchResult({
+            items: [categories[2], categories[1]],
+            total: 4,
+            current_page: 1,
+            per_page: 2,
+          }),
+        },
+
+        {
+          params: new CategorySearchParams({
+            page: 2,
+            per_page: 2,
+            sort: "name",
+          }),
+
+          result: new CategorySearchResult({
+            items: [categories[3], categories[0]],
+            total: 4,
+            current_page: 2,
+            per_page: 2,
+          }),
+        },
+      ];
+
+      for (let i = 0; i < arrange.length; i++) {
+        const result = await repository.search(arrange[i].params);
+        expect(result.toJSON(true)).toMatchObject(
+          arrange[i].result.toJSON(true)
+        );
+      }
+    });
+
+    it("should apply paginate, filter and sort", async () => {
+      const categories = [
+        Category.fake().aCategory().withName("test").build(),
+        Category.fake().aCategory().withName("TeST").build(),
+        Category.fake().aCategory().withName("a").build(),
+        Category.fake().aCategory().withName("TEST").build(),
+      ];
+
+      await repository.bulkInsert(categories);
+
+      const arrange = [
+        {
+          params: new CategorySearchParams({
+            page: 1,
+            per_page: 2,
+            filter: "TEST",
+            sort: "name",
+          }),
+          result: new CategorySearchResult({
+            items: [categories[3], categories[1]],
+            total: 3,
+            current_page: 1,
+            per_page: 2,
+          }),
+        },
+
+        {
+          params: new CategorySearchParams({
+            page: 1,
+            per_page: 2,
+            filter: "a",
+            sort: "name",
+          }),
+
+          result: new CategorySearchResult({
+            items: [categories[2]],
+            total: 1,
+            current_page: 1,
+            per_page: 2,
+          }),
+        },
+      ];
+
+      for (let i = 0; i < arrange.length; i++) {
+        const result = await repository.search(arrange[i].params);
+        expect(result.toJSON(true)).toMatchObject(
+          arrange[i].result.toJSON(true)
+        );
+      }
     });
   });
 });

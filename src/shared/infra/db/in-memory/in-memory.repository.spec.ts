@@ -43,7 +43,7 @@ describe("InMemoryRepository Unit Tests", () => {
     repo = new StubInMemoryRepository();
   });
 
-  test("should insert a new entity", async () => {
+  it("should insert a new entity", async () => {
     const entity = new StubEntity({
       entity_id: new Uuid(),
       name: "Test",
@@ -54,7 +54,7 @@ describe("InMemoryRepository Unit Tests", () => {
     expect(repo.items[0]).toBe(entity);
   });
 
-  test("shoul bulk insert entities", async () => {
+  it("should bulk insert entities", async () => {
     const entities = [
       new StubEntity({
         entity_id: new Uuid(),
@@ -73,7 +73,7 @@ describe("InMemoryRepository Unit Tests", () => {
     expect(repo.items[1]).toBe(entities[1]);
   });
 
-  test("should update an entity", async () => {
+  it("should update an entity", async () => {
     const entity = new StubEntity({ name: "name", price: 100 });
     await repo.insert(entity);
 

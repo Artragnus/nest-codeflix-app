@@ -1,6 +1,5 @@
 import { Sequelize, SequelizeOptions } from "sequelize-typescript";
 import { Config } from "../config";
-import { before } from "lodash";
 
 export function setupSequelize(options: SequelizeOptions = {}) {
   let _sequelize: Sequelize;

@@ -1,21 +1,58 @@
+import { NotFoundError } from "../../shared/domain/errors/not-found.error";
+import { Uuid } from "../../shared/domain/value-objects/uuid.vo";
+import { Category } from "../domain/category.entity";
+import { ICategoryRepository } from "../domain/category.repository";
+
 export class UpdateCategoryUseCase {
-  categoryRepo: any;
-  constructor(categoryRepo: any) {
+  constructor(private categoryRepo: ICategoryRepository) {
     this.categoryRepo = categoryRepo;
   }
-  async execute(input: { id: any }) {
-    const entity = await this.categoryRepo.findById(input.id);
-    if (!entity) {
-      throw new Error("Category not found");
+  async execute(input: UpdateCategoryUseCaseInput): Promise<UpdateCategoryUseCaseOutput> {
+    const uuid = new Uuid(input.id);
+    const category = await this.categoryRepo.findById(uuid);
+    if (!category) {
+      throw new NotFoundError(input.id, Category)
     }
-    entity.update(input);
-    await this.categoryRepo.update(entity);
+
+    input.name && category.changeName(input.name);
+    if("description" in input) {
+      category.changeDescription(input.description);
+    }
+
+    if(input.is_active === true) {
+      category.activate();
+    }
+
+    if (input.is_active === false) {
+      category.deactivate();
+    }
+
+
+    await this.categoryRepo.update(category);
+
     return {
-      id: entity.category_id.id,
-      name: entity.name,
-      description: entity.description,
-      is_active: entity.is_active,
-      created_at: entity.created_at,
-    };
+      id: category.category_id.id,
+      name: category.name,
+      description: category.description,
+      is_active: category.is_active,
+      created_at: category.created_at
+    }
+    
   }
+}
+
+
+export type UpdateCategoryUseCaseInput = {
+  id: string;
+  name?: string;
+  description?: string;
+  is_active?: boolean;
+}
+
+export type UpdateCategoryUseCaseOutput = {
+  id: string;
+  name: string;
+  description: string;
+  is_active: boolean;
+  created_at: Date;
 }

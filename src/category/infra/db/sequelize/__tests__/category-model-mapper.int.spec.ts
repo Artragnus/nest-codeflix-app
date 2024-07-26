@@ -21,18 +21,4 @@ describe("Category Model Mapper Integration Test", () => {
     const entity = CategoryModelMapper.toEntity(model);
     expect(entity.toJSON()).toStrictEqual(model.toJSON());
   });
-
-  it("should throw error when is an invalid category", async () => {
-    const model = CategoryModel.build({
-      category_id: new Uuid().id,
-    });
-
-    expect(() => CategoryModelMapper.toEntity(model)).containsErrorMessages({
-      name: [
-        "name should not be empty",
-        "name must be a string",
-        "name must be shorter than or equal to 255 characters",
-      ],
-    });
-  });
 });

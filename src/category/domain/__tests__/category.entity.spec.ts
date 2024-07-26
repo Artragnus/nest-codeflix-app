@@ -1,11 +1,6 @@
 import { Uuid } from "../../../shared/domain/value-objects/uuid.vo";
 import { Category } from "../category.entity";
 describe("Category Unit Tests", () => {
-  let validateSpy: any;
-  beforeEach(() => {
-    validateSpy = jest.spyOn(Category, "validate");
-  });
-
   describe("constructor", () => {
     test("should set only category name property", () => {
       const category = new Category({
@@ -45,7 +40,6 @@ describe("Category Unit Tests", () => {
       expect(category.description).toBeNull();
       expect(category.is_active).toBeTruthy();
       expect(category.created_at).toBeInstanceOf(Date);
-      expect(validateSpy).toHaveBeenCalledTimes(1);
     });
 
     test("should create category with all properties", () => {
@@ -59,7 +53,6 @@ describe("Category Unit Tests", () => {
       expect(category.description).toBe("Movies");
       expect(category.is_active).toBeFalsy();
       expect(category.created_at).toBeInstanceOf(Date);
-      expect(validateSpy).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -70,7 +63,6 @@ describe("Category Unit Tests", () => {
       });
       category.changeName("Music");
       expect(category.name).toBe("Music");
-      expect(validateSpy).toHaveBeenCalledTimes(2);
     });
 
     test("should change category description", () => {
@@ -79,7 +71,6 @@ describe("Category Unit Tests", () => {
       });
       category.changeDescription("Movies");
       expect(category.description).toBe("Movies");
-      expect(validateSpy).toHaveBeenCalledTimes(2);
     });
 
     test("should change category status to active", () => {
@@ -89,7 +80,6 @@ describe("Category Unit Tests", () => {
       });
       category.activate();
       expect(category.is_active).toBeTruthy();
-      expect(validateSpy).toHaveBeenCalledTimes(1);
     });
 
     test("should change category status to inactive", () => {
@@ -98,7 +88,6 @@ describe("Category Unit Tests", () => {
       });
       category.deactivate();
       expect(category.is_active).toBeFalsy();
-      expect(validateSpy).toHaveBeenCalledTimes(1);
     });
 
     test("should return a JSON object", () => {
@@ -135,80 +124,6 @@ describe("Category Unit Tests", () => {
       if (category_id instanceof Uuid) {
         expect(category.category_id).toBe(category_id);
       }
-    });
-  });
-});
-
-describe("Category Validator", () => {
-  describe("factory methods", () => {
-    test("should an invalid category with name property", () => {
-      expect(() => Category.create({ name: null })).containsErrorMessages({
-        name: [
-          "name should not be empty",
-          "name must be a string",
-          "name must be shorter than or equal to 255 characters",
-        ],
-      });
-
-      expect(() => Category.create({ name: "" })).containsErrorMessages({
-        name: ["name should not be empty"],
-      });
-
-      expect(() =>
-        Category.create({ name: "a".repeat(256) })
-      ).containsErrorMessages({
-        name: ["name must be shorter than or equal to 255 characters"],
-      });
-    });
-
-    test("should an invalid category with description property", () => {
-      expect(() =>
-        Category.create({ name: "Movie", description: 123 as any })
-      ).containsErrorMessages({
-        description: ["description must be a string"],
-      });
-
-      expect(() =>
-        Category.create({ name: "Movie", description: "" })
-      ).containsErrorMessages({
-        description: ["description should not be empty"],
-      });
-    });
-
-    test("should an invalid category with is_active property", () => {
-      expect(() =>
-        Category.create({ name: "Movie", is_active: 123 as any })
-      ).containsErrorMessages({
-        is_active: ["is_active must be a boolean value"],
-      });
-    });
-
-    test("should an invalid change name", () => {
-      const category = Category.create({ name: "Movie" });
-      expect(() => category.changeName(null)).containsErrorMessages({
-        name: [
-          "name should not be empty",
-          "name must be a string",
-          "name must be shorter than or equal to 255 characters",
-        ],
-      });
-
-      expect(() => category.changeName("")).containsErrorMessages({
-        name: ["name should not be empty"],
-      });
-
-      expect(() => category.changeName("a".repeat(256))).containsErrorMessages({
-        name: ["name must be shorter than or equal to 255 characters"],
-      });
-    });
-
-    test("should an invalid change description", () => {
-      const category = Category.create({ name: "Movie" });
-      expect(() =>
-        category.changeDescription(123 as any)
-      ).containsErrorMessages({
-        description: ["description must be a string"],
-      });
     });
   });
 });

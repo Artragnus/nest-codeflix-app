@@ -1,6 +1,6 @@
-import { Uuid } from "../../../../shared/domain/value-objects/uuid.vo";
-import { InMemoryRepository } from "../../../../shared/infra/db/in-memory/in-memory.repository";
-import { CategoryInMemoryRepository } from "../../../infra/db/in-memory/category-in-memory.repository";
+import { Uuid } from "../../../../../shared/domain/value-objects/uuid.vo";
+import { InMemoryRepository } from "../../../../../shared/infra/db/in-memory/in-memory.repository";
+import { CategoryInMemoryRepository } from "../../../../infra/db/in-memory/category-in-memory.repository";
 import { CreateCategoryUseCase } from "../../create-category.use.case";
 
 describe("Create Category Use Case Unit Test", () => {

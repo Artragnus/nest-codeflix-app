@@ -3,11 +3,7 @@ import {
   PaginationOutputMapper,
 } from "../../../shared/application/pagination-output";
 import { IUseCase } from "../../../shared/application/use-case.interface";
-import {
-  SearchParams,
-  SortDirection,
-} from "../../../shared/domain/repository/search-params";
-import { SearchResult } from "../../../shared/domain/repository/search-result";
+import { SortDirection } from "../../../shared/domain/repository/search-params";
 import {
   CategoryFilter,
   CategorySearchParams,

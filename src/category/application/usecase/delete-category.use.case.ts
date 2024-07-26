@@ -3,20 +3,18 @@ import { Uuid } from "../../../shared/domain/value-objects/uuid.vo";
 import { ICategoryRepository } from "../../domain/category.repository";
 
 export class DeleteCategoryUseCase
-  implements IUseCase<DeleteCategoryUseCaseInput, DeleteCategoryUseCaseOutput>
+  implements IUseCase<DeleteCategoryInput, DeleteCategoryOutput>
 {
   constructor(private categoryRepo: ICategoryRepository) {}
 
-  async execute(
-    input: DeleteCategoryUseCaseInput
-  ): Promise<DeleteCategoryUseCaseOutput> {
+  async execute(input: DeleteCategoryInput): Promise<DeleteCategoryOutput> {
     const uuid = new Uuid(input.id);
     return await this.categoryRepo.delete(uuid);
   }
 }
 
-export type DeleteCategoryUseCaseInput = {
+export type DeleteCategoryInput = {
   id: string;
 };
 
-export type DeleteCategoryUseCaseOutput = void;
+export type DeleteCategoryOutput = void;
